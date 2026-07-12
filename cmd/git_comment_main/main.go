@@ -104,10 +104,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	var selected int
-	if _, err := fmt.Sscanf(input, "%d", &selected); err != nil || selected < 1 || selected > len(messages) {
-		fmt.Println("Invalid selection.")
-		os.Exit(1)
+	selected := 1
+	if input != "" {
+		if _, err := fmt.Sscanf(input, "%d", &selected); err != nil || selected < 1 || selected > len(messages) {
+			fmt.Println("Invalid selection.")
+			os.Exit(1)
+		}
 	}
 
 	commitMsg := messages[selected-1]
