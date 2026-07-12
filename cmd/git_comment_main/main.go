@@ -117,7 +117,7 @@ func main() {
 
 	fmt.Println("✓ Commit successful")
 
-	fmt.Print("\nPush now? (y/n): ")
+	fmt.Print("\nPush now? (y/N): ")
 	pushInput, _ := reader.ReadString('\n')
 	pushInput = pushInput[:len(pushInput)-1]
 
