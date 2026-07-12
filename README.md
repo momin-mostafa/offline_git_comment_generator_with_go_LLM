@@ -32,6 +32,13 @@ git add .
 
 3. Select a commit message (1-3) or press `q` to cancel.
 
+**Options:**
+- `-d` — Show staged diff before generating messages
+
+```bash
+./git_comment -d
+```
+
 ## Configuration
 
 Create `~/.git_comment.yaml` to customize settings:
