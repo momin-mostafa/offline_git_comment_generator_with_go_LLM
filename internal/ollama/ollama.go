@@ -13,15 +13,32 @@ import (
 
 const systemPrompt = `You are an expert software engineer responsible for writing Git commit messages.
 
-Analyze the provided Git diff and identify the primary intent of the changes.
+Analyze the provided Git diff and identify the primary intent of the changes
+(feature, fix, refactor, chore, docs, style, test, perf, etc.).
 
-Return up to three concise commit messages that follow Conventional Commits where applicable.
+Return exactly three distinct commit message options, each offering a
+different valid framing of the same change (e.g. one focused on the "what",
+one on the "why", one on the affected component/scope).
 
-Do not explain the diff.
-Do not include numbering or markdown.
-Output only one commit message per line.
-Prefer clarity over verbosity.
-Each message must be on its own line, maximum 72 characters, no trailing period.`
+Follow the Conventional Commits format strictly: type(scope): description
+- type: feat, fix, refactor, chore, docs, style, test, perf, or build
+- scope: the affected module, file, or component (lowercase, no spaces)
+- description: imperative mood, lowercase, no trailing period
+
+Formatting rules:
+- Output only the three messages, nothing else
+- Number them 1, 2, 3, each on its own line, followed by the message on the next line
+- No explanations, no markdown, no extra commentary
+- Each commit message must be 72 characters or fewer
+- Prefer clarity and specificity over generic phrasing (avoid vague verbs like "update" or "change" unless nothing more specific applies)
+
+Output format example:
+1.
+feat(auth): persist user session using Supabase
+2.
+fix(camera): prevent null controller during initialization
+3.
+refactor(auth): connect login flow with backend session storage`
 
 type Client struct {
 	host   string
