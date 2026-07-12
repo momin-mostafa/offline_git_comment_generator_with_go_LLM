@@ -49,6 +49,13 @@ func Load() (*models.Config, error) {
 		return nil, err
 	}
 
+	if config.MaxOptions < 1 {
+		config.MaxOptions = defaultMaxOptions
+	}
+	if config.Temperature <= 0 || config.Temperature > 2 {
+		config.Temperature = defaultTemperature
+	}
+
 	return config, nil
 }
 
