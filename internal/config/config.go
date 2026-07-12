@@ -9,7 +9,7 @@ import (
 )
 
 const (
-	defaultModel           = "llama3.2"
+	defaultModel           = "qwen2.5-coder"
 	defaultHost            = "http://localhost:11434"
 	defaultTemperature     = 0.2
 	defaultMaxOptions      = 3
