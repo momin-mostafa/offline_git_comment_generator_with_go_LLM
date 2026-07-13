@@ -136,6 +136,51 @@ func (c *Client) GenerateCommitMessages(diff string) ([]string, error) {
 	return messages, nil
 }
 
+func (c *Client) FormatCommitMessage(rawMessage string, diff string) (string, error) {
+	prompt := fmt.Sprintf(`You are an expert software engineer. A developer wrote this commit message:
+
+"%s"
+
+Based on the Git diff below, rewrite the message to be clear, concise, and follow Conventional Commits format (type(scope): description). Output only the reformatted commit message, nothing else.
+
+Git diff:
+%s`, rawMessage, diff)
+
+	request := models.OllamaRequest{
+		Model:  c.model,
+		Stream: false,
+		Options: &models.Options{
+			Temperature: c.temp,
+		},
+		Messages: []models.Message{
+			{Role: "user", Content: prompt},
+		},
+	}
+
+	jsonData, err := json.Marshal(request)
+	if err != nil {
+		return "", err
+	}
+
+	resp, err := c.client.Post(c.host+"/api/chat", "application/json", bytes.NewBuffer(jsonData))
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	var ollamaResp models.OllamaResponse
+	if err := json.Unmarshal(body, &ollamaResp); err != nil {
+		return "", err
+	}
+
+	return strings.TrimSpace(ollamaResp.Message.Content), nil
+}
+
 func (c *Client) parseResponse(content string) []string {
 	lines := strings.Split(strings.TrimSpace(content), "\n")
 	var messages []string

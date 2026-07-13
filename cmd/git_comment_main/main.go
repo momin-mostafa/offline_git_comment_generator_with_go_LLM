@@ -85,6 +85,7 @@ func main() {
 	for i, msg := range messages {
 		fmt.Printf("%d. %s\n", i+1, msg)
 	}
+	fmt.Printf("0. Write your own commit message\n")
 
 	sigChan := make(chan os.Signal, 1)
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
@@ -94,25 +95,74 @@ func main() {
 		os.Exit(0)
 	}()
 
-	fmt.Print("\nChoose (1-" + fmt.Sprintf("%d", len(messages)) + ") or q: ")
 	reader := bufio.NewReader(os.Stdin)
-	input, _ := reader.ReadString('\n')
-	input = input[:len(input)-1]
+	var commitMsg string
 
-	if input == "q" {
-		fmt.Println("Aborted.")
-		os.Exit(0)
-	}
+	for {
+		fmt.Printf("\nChoose (1-%d, 0 to write your own) or q: ", len(messages))
+		input, _ := reader.ReadString('\n')
+		input = input[:len(input)-1]
 
-	selected := 1
-	if input != "" {
-		if _, err := fmt.Sscanf(input, "%d", &selected); err != nil || selected < 1 || selected > len(messages) {
+		if input == "q" {
+			fmt.Println("Aborted.")
+			os.Exit(0)
+		}
+
+		if input == "" {
+			commitMsg = messages[0]
+			break
+		}
+
+		var selected int
+		if _, err := fmt.Sscanf(input, "%d", &selected); err != nil || selected < 0 || selected > len(messages) {
 			fmt.Println("Invalid selection.")
-			os.Exit(1)
+			continue
+		}
+
+		if selected == 0 {
+			fmt.Print("\nEnter your commit message: ")
+			customMsg, _ := reader.ReadString('\n')
+			customMsg = customMsg[:len(customMsg)-1]
+			if customMsg == "" {
+				fmt.Println("Empty message. Try again.")
+				continue
+			}
+
+			fmt.Println("\nHow would you like to proceed?")
+			fmt.Println("1. Formatted (refine with LLM)")
+			fmt.Println("2. Unformatted (use as-is)")
+
+			for {
+				fmt.Print("\nChoose (1-2): ")
+				formatInput, _ := reader.ReadString('\n')
+				formatInput = formatInput[:len(formatInput)-1]
+
+				if formatInput == "1" {
+					fmt.Println("Formatting commit message...")
+					formatted, err := client.FormatCommitMessage(customMsg, diff)
+					if err != nil {
+						fmt.Printf("Error formatting message: %v\nUsing unformatted version.\n", err)
+						commitMsg = customMsg
+					} else {
+						commitMsg = formatted
+					}
+					break
+				} else if formatInput == "2" {
+					commitMsg = customMsg
+					break
+				} else {
+					fmt.Println("Invalid selection.")
+				}
+			}
+			break
+		}
+
+		if selected >= 1 && selected <= len(messages) {
+			commitMsg = messages[selected-1]
+			break
 		}
 	}
 
-	commitMsg := messages[selected-1]
 	fmt.Printf("\nRunning\n\ngit commit -m \"%s\"\n\n", commitMsg)
 
 	output, err := git.Commit(commitMsg)
