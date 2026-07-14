@@ -11,8 +11,8 @@ Local LLM-powered Git commit message generator. Forges meaningful commit message
 ## Installation
 
 ```bash
-git clone <repo-url>
-cd git_comment_maker
+git clone https://github.com/momin-mostafa/CommitSmith.git
+cd CommitSmith
 ./build.sh
 ```
 
