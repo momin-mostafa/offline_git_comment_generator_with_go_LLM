@@ -70,13 +70,12 @@ When you choose `0` (write your own):
 Choose (1-3, 0 to write your own) or q: 0
 
 Enter your commit message: update the token stuff
-
-How would you like to proceed?
-1. Formatted (refine with LLM)
-2. Unformatted (use as-is)
-
-Choose (1-2): 1
 Formatting commit message...
+
+Formatted: fix(auth): update token refresh logic
+Original:  update the token stuff
+
+Use formatted? (Y/n): Y
 
 Running
 
